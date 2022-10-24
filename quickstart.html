@@ -32,8 +32,8 @@
             //カメラの作成
             camera = new THREE.PerspectiveCamera(0.5, window.innerWidth / window.innerHeight, 0.1, 1000);
             //カメラセット
-            camera.position.set(-20, 30, 50);
-            camera.lookAt(new THREE.Vector3(0, 10, 0));
+            camera.position.set(0, 0, 5);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
              // 滑らかにカメラコントローラーを制御する
             const controls = new OrbitControls(camera, document.body);
             controls.enableDamping = true;

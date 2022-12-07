@@ -31,7 +31,7 @@ function init() {
 
     //光源
     const light = new THREE.SpotLight(0xffffff, 1); //color,強度
-    light.position.set(-20, 30, 30);
+    light.position.set(100, 100, 100);
     scene.add(light);
 
     //レンダラー

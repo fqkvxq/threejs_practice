@@ -14,12 +14,22 @@
         canvas {
             background-color: rgba(0,0,0,0.5);
         }
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
     </style>
     <script src="https://unpkg.com/three@0.140.2/build/three.min.js"></script>
 </head>
 
 <body>
     <div id="WebGL-output">
+        <video src="./imgs/Pexels Videos 3867.mp4" autoplay muted loop></video>
     </div>
     <script type="module" src="./js/quickstart.js"></script>
 </body>

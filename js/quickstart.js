@@ -8,17 +8,16 @@ import {
 let camera;
 let scene;
 let renderer;
-let model;
-init();
-animate();
+let logoModel;
 
+window.addEventListener('DOMContentLoaded', init);
 function init() {
     //シーンの作成
     scene = new THREE.Scene();
+
     //カメラの作成
     camera = new THREE.PerspectiveCamera(0.5, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // 星屑
-    createStarField();
+
     //カメラセット
     camera.position.set(0, 0, 20);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -31,9 +30,10 @@ function init() {
     // controls.dampingFactor = 0.2;
 
     //光源
-    const dirLight = new THREE.SpotLight(0xffffff, 1.5); //color,強度
-    dirLight.position.set(-20, 30, 30);
-    scene.add(dirLight);
+    const light = new THREE.SpotLight(0xffffff, 1); //color,強度
+    light.position.set(-20, 30, 30);
+    scene.add(light);
+
     //レンダラー
     renderer = new THREE.WebGLRenderer({
         alpha: true,
@@ -41,61 +41,73 @@ function init() {
     });
 
     // 背景色
-    renderer.setClearColor(new THREE.Color(0x000000));
+    renderer.setClearColor(0x000000, 0);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+    loadGlbfile();
     //glbファイルの読み込み
-    const loader = new GLTFLoader();
-    loader.load('./untitled.glb', function (gltf) {
-        model = gltf.scene;
-        model.traverse((object) => { //モデルの構成要素
-            if (object.isMesh) { //その構成要素がメッシュだったら
-                object.material.trasparent = true; //透明許可
-                object.material.opacity = 1; //透過
-                object.material.depthTest = true; //陰影で消える部分
-            }
-        })
-        // add
-        scene.add(model);
-    }, undefined, function (e) {
-        console.error(e);
-    });
-    document.getElementById("WebGL-output").appendChild(renderer.domElement);
-}
-
-function createStarField() {
-    // 頂点情報を格納する配列
-    const vertices = [];
-    // 配置する範囲
-    const SIZE = 3000;
-    // 配置する個数
-    const LENGTH = 1000;
-    for (let i = 0; i < LENGTH; i++) {
-        const x = SIZE * (Math.random() - 0.5);
-        const y = SIZE * (Math.random() - 0.5);
-        const z = SIZE * (Math.random() - 0.5);
-        vertices.push(x, y, z);
+    function loadGlbfile() {
+        const loader = new GLTFLoader();
+        loader.load('./untitled.glb', function (gltf) {
+            logoModel = gltf.scene;
+            logoModel.traverse((object) => { //モデルの構成要素
+                if (object.isMesh) { //その構成要素がメッシュだったら
+                    object.material.trasparent = true; //透明許可
+                    object.material.opacity = 1; //透過
+                    object.material.depthTest = true; //陰影で消える部分
+                }
+            })
+            // add
+            scene.add(logoModel);
+        }, undefined, function (e) {
+            console.error(e);
+        });
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
     }
-    // 形状データを作成
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    // マテリアルを作成
-    const material = new THREE.PointsMaterial({
-        // 一つ一つのサイズ
-        size: 10,
-        // 色
-        color: 0xffffff,
-    });
-    // 物体を作成
-    const mesh = new THREE.Points(geometry, material);
-    scene.add(mesh);
-}
-animate();
 
-function animate() {
-    requestAnimationFrame(animate);
-    model.rotation.x += 0.005;
-    model.rotation.y += 0.005;
-    model.rotation.z += 0.005;
+    createThreeDObject();
+
+    function createThreeDObject() {
+        // 3Dオブジェクトを作る
+        const x_size = window.innerWidth;
+        const y_size = window.innerHeight;
+        const length = 300;
+        const plane_scale = 4;
+        const plane = [];
+
+        for (let i = 0; i < length; i++) {
+            let geometry = new THREE.SphereGeometry(plane_scale, plane_scale, plane_scale);
+            var material = new THREE.MeshBasicMaterial({
+                color: '0xcccccc',
+                opacity: 1,
+                transparent: true
+            });
+
+            plane[i] = new THREE.Mesh(geometry, material);
+
+            plane[i].position.x = x_size * (Math.random() - 0.5);
+            plane[i].position.y = y_size * (Math.random() - 0.5);
+            plane[i].position.z = x_size * (Math.random() - 0.5);
+            scene.add(plane[i]);
+        }
+    }
+}
+
+function random(min, max) {
+    let rand = Math.floor((min + (max - min + 1) * Math.random()));
+    return rand;
+}
+
+tick();
+function tick() {
+    // このメソッドは、ブラウザーにアニメーションを行いたいことを知らせ、指定した関数を呼び出して次の再描画の前にアニメーションを更新することを要求します。このメソッドは、再描画の前に呼び出されるコールバック 1 個を引数として取ります。
+    requestAnimationFrame(tick);
+
+    // レンダリング処理
     renderer.render(scene, camera);
+
+
+    logoModel.rotation.x += 0.005;
+    logoModel.rotation.y += 0.005;
+    logoModel.rotation.z += 0.005;
 }
